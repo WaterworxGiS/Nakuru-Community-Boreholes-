@@ -26,7 +26,7 @@ library(janitor)
 ```
 
 
-# {Mapped Boreholes and Borehole Map}
+# {Mapped Boreholes & Map}
 ```{r}
   
 ```
