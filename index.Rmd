@@ -1,5 +1,5 @@
 ---
-title: Nakuru Communities Boreholes
+title: Nakuru Communities Boreholes Inventory
 output: 
   flexdashboard::flex_dashboard:
     orientation: column
@@ -343,7 +343,7 @@ Data4%>%
   #e_labels(TRUE)%>%
    e_title(text = 'Land_Owners',
           subtext = '',
-          left='center', top=20)%>%
+          left='center', top=10)%>%
   e_toolbox_feature('dataView')%>%
   e_toolbox_feature('restore') %>%
   e_toolbox_feature('saveAsImage')%>%
