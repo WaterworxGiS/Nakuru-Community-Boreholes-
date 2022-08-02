@@ -1,0 +1,436 @@
+---
+title: Nakuru Communities Boreholes Inventory
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: column
+    vertical_layout: fill
+    theme: flatly
+    #runtime: shiny
+---
+
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(highcharter)
+library(tidyverse)
+library(maps)
+library(htmlwidgets)
+library(leaflet)
+library(echarts4r)
+library(dplyr)
+library(DT)
+library(mapview)
+library(sf)
+library(sp)
+library(janitor)
+```
+
+
+# {Mapped Boreholes and Borehole Map}
+```{r}
+  
+```
+
+column: {.sidebar},
+--------------------------------------------------------------
+
+
+```{r read}
+Data4 <- read_csv("E:/Nakuru WaterWax/Unicef Project/Data Using R/Borehole Data in Flex dashboard/Data4.csv")
+
+Data4$Longitude <- as.numeric(Data4$Longitude)
+Data4$Latitude <- as.numeric(Data4$Latitude)
+
+data.sp <- SpatialPointsDataFrame(Data4[,c(3,4)], Data4[,-c(3,4)])
+
+
+
+
+```
+
+
+
+Row {data-width=2300}
+-----------------------------------------------------------------------
+
+### Mapped Boreholes Per Sub-County
+
+```{r}
+
+Data4%>%
+  group_by(Sub_Counties)%>%
+  summarise(Count=n())%>% #number of times variable appears
+  e_charts(Sub_Counties)%>%
+  e_bar(serie = Count,radius=c('30%','70%'))%>%
+  e_tooltip(trigger = "item")%>%
+  #e_labels(TRUE)%>%
+   e_title(text = 'Mapped Boreholes',
+          subtext = '',
+          left='center', top=20)%>%
+  e_legend(orient='horizontal',left=8,top="95%")%>%
+  e_image_g(right=20, top=30,z = -999,style=list(image = "https://www.vei.nl/IManager/Media/100847/1850525/EN/reg/waterworx-logo-final.jpg",
+      width = 100,
+      height = 100,
+      opacity = .6))%>%
+e_toolbox_feature('dataView')%>%
+  e_toolbox_feature('restore') %>%
+  e_toolbox_feature('saveAsImage')%>%
+   e_toolbox_feature('dataZoom')%>%
+e_theme('purple-passion')
+  #e_theme('shine')
+
+
+
+```
+
+Row {data-width=2300}
+--------------------------------------------------------------------
+
+### Map of the Mapped Boreholes
+
+```{r}
+
+```
+
+
+
+```{r}
+leaflet() %>%
+  
+addProviderTiles("Esri") %>%
+  setView(lng = 36.058758, lat= -0.427551, zoom=9) %>%
+ addScaleBar(position='bottomleft') %>% 
+  addMeasure() %>% 
+  addMarkers(data=Data4, lng = ~Longitude,
+   lat = ~Latitude,
+   popup = ~Borehole_Name, clusterOptions = markerClusterOptions()) 
+
+```
+
+
+# {Production, Operation & Population }
+
+
+Row {data-height=400}
+--------------------------------------------------------------------
+
+### Total Sub-County Production
+
+```{r}
+ Data4%>%
+  group_by(Sub_Counties)%>%
+  summarise(Total_Yield=sum(Yield))%>%
+  #arrange(Yield)%>%
+  e_charts(Sub_Counties)%>%
+  e_bar(serie = Total_Yield,roseType='radius')%>%
+  e_tooltip(trigger = "item")%>%
+  #e_labels(TRUE)%>%
+   e_title(text = 'Projects Sub-Counties Production',
+          subtext = '',
+          left='center', top=20)%>%
+  e_toolbox_feature('dataView')%>%
+  e_toolbox_feature('restore') %>%
+   e_toolbox_feature('dataZoom')%>%
+  e_toolbox_feature('saveAsImage')%>%
+  e_legend(show = TRUE)%>%
+    e_legend(orient='horizontal',left=8,top="90%")%>%
+  e_theme('dark') 
+ 
+```
+
+Row {data-height=400}
+--------------------------------------------------------------------
+
+### Boreholes Currently Under Production
+
+```{r}
+Data4%>%
+  group_by(Operational_Status)%>%
+  summarise(Count=n())%>% #number of times variable appears
+  e_charts(Operational_Status)%>%
+  e_pie(serie = Count,radius=c('30%','70%'))%>%
+  e_tooltip(trigger = "item")%>%
+  #e_labels(TRUE)%>%
+   e_title(text = 'Mapped Boreholes Operational Status',
+          subtext = '',
+          left='center', top=20)%>%
+  e_toolbox_feature('dataView')%>%
+  e_toolbox_feature('restore') %>%
+  e_toolbox_feature('saveAsImage')%>%
+  e_legend(orient='horizontal',left=8,top="85%")%>%
+  e_theme('chalk')
+
+```
+
+Row {data-height=600}
+--------------------------------------------------------------------
+
+### Connected Population
+
+```{r}
+Data4%>%
+  group_by(Sub_Counties)%>%
+  summarise(Households_Connected=sum(Connected_Households))%>%
+  arrange(Households_Connected)%>%
+  e_charts(Sub_Counties)%>%
+  e_pie(serie = Households_Connected,roseType='radius')%>%
+  e_tooltip(trigger = "item")%>%
+  #e_labels(TRUE)%>%
+   e_title(text = 'Connected Households',
+          subtext = '',
+          left='center', top=20)%>%
+  e_toolbox_feature('dataView')%>%
+  e_toolbox_feature('restore') %>%
+   e_toolbox_feature('dataZoom')%>%
+  e_toolbox_feature('saveAsImage')%>%
+  e_legend(show = TRUE)%>%
+    e_legend(orient='horizontal',left=8,top="80%")%>%
+  e_theme('dark-blue')
+
+```
+
+Row {data-height=400}
+--------------------------------------------------------------------
+
+### Cumulative Households Using Water Kiosk 
+
+```{r}
+Data4%>%
+  group_by(Sub_Counties)%>%
+  summarise(Households_using_Water_Kiosks=sum(Households_using_Water_Kiosks))%>%
+  arrange(Households_using_Water_Kiosks)%>%
+  e_charts(Sub_Counties)%>%
+  e_pie(serie = Households_using_Water_Kiosks, radius=c('30%','70%'))%>%
+  e_tooltip(trigger = "item")%>%
+  #e_labels(TRUE)%>%
+   e_title(text = 'Number Households Using Kiosks ',
+          subtext = '',
+          left='center', top=20)%>%
+  e_toolbox_feature('dataView')%>%
+   e_toolbox_feature('dataZoom')%>%
+  e_toolbox_feature('restore') %>%
+  e_toolbox_feature('saveAsImage')%>%
+  e_legend(show = TRUE)%>%
+    e_legend(orient='horizontal',left=8,top="85%")%>%
+  e_theme('chalk')
+
+```
+
+
+
+# {Power_Source, WRA_Permit, Collecting_Revenue & Funders }
+```{r}
+
+```
+
+
+
+Row {data-height=400}
+----------------------------------------------------------------------
+
+### Power Source
+
+
+```{r}
+Data4%>%
+  group_by(Power_Source)%>%
+  summarise(Count=n())%>% #number of times variable appears
+  e_charts(Power_Source)%>%
+  e_pie(serie = Count,radius=c('30%','70%'))%>%
+  e_tooltip(trigger = "item")%>%
+  #e_labels(TRUE)%>%
+   e_title(text = 'Operating Boreholes Power Options',
+          subtext = '',
+          left='center', top=20)%>%
+  e_toolbox_feature('dataView')%>%
+  e_toolbox_feature('restore') %>%
+   e_toolbox_feature('dataZoom')%>%
+  e_toolbox_feature('saveAsImage')%>%
+  e_legend(orient='horizontal',left=8,top="85%")%>%
+  e_theme('chalk')
+
+```
+
+Column {data-width=650}
+----------------------------------------------------------------------
+
+### WRA Permit
+
+```{r}
+Data4%>%
+  group_by(WRA_Permit_Status)%>%
+  summarise(Count=n())%>% #number of times variable appears
+  e_charts(WRA_Permit_Status)%>%
+  e_bar(serie = Count,radius=c('30%','70%'))%>%
+  e_tooltip(trigger = "item")%>%
+  #e_labels(TRUE)%>%
+   e_title(text = 'WRA Permit availability Status',
+          subtext = '',
+          left='center', top=20)%>%
+  e_toolbox_feature('dataView')%>%
+  e_toolbox_feature('restore') %>%
+  e_toolbox_feature('saveAsImage')%>%
+  e_legend(orient='horizontal',left=8,top="90%")%>%
+  e_theme('chalk')
+```
+
+
+
+### Collecting Revenue
+
+```{r}
+Data4%>%
+  group_by(Revenue_Collection_Status)%>%
+  summarise(Count=n())%>% #number of times variable appears
+  e_charts(Revenue_Collection_Status)%>%
+  e_bar(serie = Count,radius=c('30%','70%'))%>%
+  e_tooltip(trigger = "item")%>%
+  #e_labels(TRUE)%>%
+   e_title(text = 'Collecting Revenue Status',
+          subtext = '',
+          left='center', top=20)%>%
+  e_toolbox_feature('dataView')%>%
+  e_toolbox_feature('restore') %>%
+  e_toolbox_feature('saveAsImage')%>%
+  e_legend(orient='horizontal',left=8,top="90%")%>%
+  e_theme('dark')
+
+```
+
+
+Row {data-height=400}
+----------------------------------------------------------------------
+
+### Funders
+
+
+```{r}
+Data4%>%
+  group_by(Funder)%>%
+  summarise(Count=n())%>% #number of times variable appears
+  e_charts(Funder)%>%
+  e_pie(serie = Count,radius=c('30%','70%'))%>%
+  e_tooltip(trigger = "item")%>%
+  #e_labels(TRUE)%>%
+   e_title(text = 'Primary Financial Source of the Borehole',
+          subtext = '',
+          left='center', top=20)%>%
+  e_toolbox_feature('dataView')%>%
+  e_toolbox_feature('dataZoom')%>%
+  e_toolbox_feature('restore') %>%
+  e_toolbox_feature('saveAsImage')%>%
+  e_legend(orient='horizontal',left=8,top="85%")%>%
+  e_theme('dark')
+
+```
+
+
+# (Projects Land Ownership)
+
+
+
+```{r}
+
+```
+
+```{r}
+Data4%>%
+  group_by(Land_Owner)%>%
+  summarise(Count=n())%>% #number of times variable appears
+  e_charts(Land_Owner)%>%
+  e_pie(serie = Count,roseType='radius')%>%
+  e_tooltip(trigger = "item")%>%
+  #e_labels(TRUE)%>%
+   e_title(text = 'Land_Owners',
+          subtext = '',
+          left='center', top=20)%>%
+  e_toolbox_feature('dataView')%>%
+  e_toolbox_feature('restore') %>%
+  e_toolbox_feature('saveAsImage')%>%
+  e_legend(orient='horizontal',left=8,top="90%")%>%
+  e_theme('dark')
+
+```
+
+
+# {Tables}
+
+```{r}
+
+```
+
+Row {data-height=250}
+----------------------------------------------------------------------
+
+### Operational_Status
+
+
+```{r}
+Data4 %>% 
+  group_by(Sub_Counties) %>% 
+  tabyl(Sub_Counties,Operational_Status) %>% 
+  adorn_totals("row") 
+ # adorn_percentages("row") %>% 
+  #adorn_pct_formatting()
+```
+
+Row {data-height=250}
+----------------------------------------------------------------------
+
+### WRA Permision Availability Status
+
+
+```{r}
+Data4 %>% 
+  group_by(Sub_Counties) %>% 
+  tabyl(Sub_Counties,WRA_Permit_Status) %>% 
+  adorn_totals("row") 
+```
+Column {data-height=250}
+----------------------------------------------------------------------
+
+### Collecting  revenue Status
+
+```{r}
+Data4 %>% 
+  group_by(Sub_Counties) %>% 
+  tabyl(Sub_Counties,Revenue_Collection_Status) %>% 
+  adorn_totals("row") 
+```
+
+
+Column {data-width=650}
+----------------------------------------------------------------------
+
+### Power Source
+
+```{r}
+Data4 %>% 
+  group_by(Sub_Counties) %>% 
+  tabyl(Sub_Counties,Power_Source) %>% 
+  adorn_totals("row") %>% 
+  adorn_percentages("row") %>% 
+  adorn_pct_formatting()
+```
+
+
+# {Data}
+```{r}
+
+```
+
+
+
+
+```{r}
+datatable(Data4,
+          caption = "Nakuru Community Boreholes Data",
+          rownames = T,
+          filter = "top",
+          class = "hover cell-border stripe", #for making grid cells
+          #editable = "cell", # for editing cells
+          extensions="Buttons",
+          options = list(pageLength = 20,dom="Bfrtip", buttons=c( '','', '' )))
+
+```
+
