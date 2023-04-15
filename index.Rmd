@@ -57,29 +57,25 @@ Row {data-width=2300}
 
 ```{r}
 
-Data4%>%
-  group_by(Sub_Counties)%>%
-  summarise(Count=n())%>% #number of times variable appears
-  e_charts(Sub_Counties)%>%
-  e_bar(serie = Count,radius=c('30%','70%'))%>%
-  e_tooltip(trigger = "item")%>%
-  #e_labels(TRUE)%>%
-   e_title(text = 'Mapped Boreholes',
-          subtext = '',
-          left='center', top=20)%>%
-  e_legend(orient='horizontal',left=8,top="95%")%>%
-  e_image_g(right=20, top=30,z = -999,style=list(image = "https://www.vei.nl/IManager/Media/100847/1850525/EN/reg/waterworx-logo-final.jpg",
-      width = 100,
-      height = 100,
-      opacity = .6))%>%
-e_toolbox_feature('dataView')%>%
-  e_toolbox_feature('restore') %>%
-  e_toolbox_feature('saveAsImage')%>%
-   e_toolbox_feature('dataZoom')%>%
-e_theme('purple-passion')
-  #e_theme('shine')
 
-
+Data4 %>% 
+  group_by(Sub_Counties)%>% 
+  summarise(Number=n()) %>% 
+  arrange(-Number) %>% # indicate - to arrange from big to small
+  hchart(
+    'bar', hcaes(x=Sub_Counties, y=Number),
+    showInLegend=F,
+    maxSize = "25%",
+    dataLabels = list(enabled = T, format = '{point.y: .0f} ')) %>% 
+  hc_title(
+    text='Mapped Communities Boreholes',
+    style = list(fontWeight = "bold", fontSize = "15px"),
+    align = "center") %>% 
+  hc_tooltip(sort = TRUE, table = TRUE) %>% 
+  #hc_add_theme(hc_theme_darkunica())%>% 
+  hc_add_theme(hc_theme_flat()) %>% 
+  hc_yAxis(title=list(text='Number' )) %>% 
+  hc_xAxis(title=list(text='Nakuru Sub-Counties'))
 
 ```
 
@@ -117,24 +113,24 @@ Row {data-height=400}
 ### Total Sub-County Production
 
 ```{r}
- Data4%>%
+ 
+Data4 %>% 
   group_by(Sub_Counties)%>%
   summarise(Total_Yield=sum(Yield))%>%
-  #arrange(Yield)%>%
-  e_charts(Sub_Counties)%>%
-  e_bar(serie = Total_Yield,roseType='radius')%>%
-  e_tooltip(trigger = "item")%>%
-  #e_labels(TRUE)%>%
-   e_title(text = 'Projects Sub-Counties Production',
-          subtext = '',
-          left='center', top=20)%>%
-  e_toolbox_feature('dataView')%>%
-  e_toolbox_feature('restore') %>%
-   e_toolbox_feature('dataZoom')%>%
-  e_toolbox_feature('saveAsImage')%>%
-  e_legend(show = TRUE)%>%
-    e_legend(orient='horizontal',left=8,top="90%")%>%
-  e_theme('dark') 
+  arrange(Total_Yield ) %>% # indicate - to arrange from big to small
+  hchart(
+    'column', hcaes(x=Sub_Counties, y=Total_Yield),
+    showInLegend=F,
+    maxSize = "25%",
+    dataLabels = list(enabled = T, format = '{point.y: .0f} ')) %>% 
+  hc_title(
+    text='Projects Sub-Counties Production',
+    style = list(fontWeight = "bold", fontSize = "15px"),
+    align = "center") %>% 
+  hc_tooltip(sort = TRUE, table = TRUE) %>% 
+  hc_add_theme(hc_theme_economist())%>% 
+  hc_yAxis(title=list(text='Production (m3/d)' )) %>% 
+  hc_xAxis(title=list(text='Nakuru Sub-Counties'))
  
 ```
 
@@ -144,22 +140,24 @@ Row {data-height=400}
 ### Boreholes Currently Under Production
 
 ```{r}
-Data4%>%
-  group_by(Operational_Status)%>%
-  summarise(Count=n())%>% #number of times variable appears
-  e_charts(Operational_Status)%>%
-  e_pie(serie = Count,radius=c('30%','70%'))%>%
-  e_tooltip(trigger = "item")%>%
-  #e_labels(TRUE)%>%
-   e_title(text = 'Mapped Boreholes Operational Status',
-          subtext = '',
-          left='center', top=20)%>%
-  e_toolbox_feature('dataView')%>%
-  e_toolbox_feature('restore') %>%
-  e_toolbox_feature('saveAsImage')%>%
-  e_legend(orient='horizontal',left=8,top="85%")%>%
-  e_theme('chalk')
 
+Data4 %>% 
+  group_by(Operational_Status)%>%
+  summarise(Number=n())%>% 
+  #arrange(-Number) %>% # indicate - to arrange from big to small
+  hchart(
+    'pie', hcaes(x=Operational_Status, y=Number),
+    showInLegend=F,
+    maxSize = "25%",
+    dataLabels = list(enabled = T, format = '{point.name} , {point.y: .0f} ')) %>% 
+  hc_title(
+    text='Operational Status',
+    style = list(fontWeight = "bold", fontSize = "15px"),
+    align = "center") %>% 
+  hc_tooltip(sort = TRUE, table = TRUE) %>% 
+  hc_add_theme(hc_theme_538()) %>% 
+  hc_yAxis(title=list(text='Number')) %>% 
+  hc_xAxis(title=list(text='Operational Status'))
 ```
 
 Row {data-height=600}
@@ -168,24 +166,25 @@ Row {data-height=600}
 ### Connected Population
 
 ```{r}
-Data4%>%
+
+
+Data4 %>% 
   group_by(Sub_Counties)%>%
   summarise(Households_Connected=sum(Connected_Households))%>%
-  arrange(Households_Connected)%>%
-  e_charts(Sub_Counties)%>%
-  e_pie(serie = Households_Connected,roseType='radius')%>%
-  e_tooltip(trigger = "item")%>%
-  #e_labels(TRUE)%>%
-   e_title(text = 'Connected Households',
-          subtext = '',
-          left='center', top=20)%>%
-  e_toolbox_feature('dataView')%>%
-  e_toolbox_feature('restore') %>%
-   e_toolbox_feature('dataZoom')%>%
-  e_toolbox_feature('saveAsImage')%>%
-  e_legend(show = TRUE)%>%
-    e_legend(orient='horizontal',left=8,top="80%")%>%
-  e_theme('dark-blue')
+  arrange(-Households_Connected)%>%# indicate - to arrange from big to small
+  hchart(
+    'column', hcaes(x=Sub_Counties, y= Households_Connected),
+    showInLegend=F,
+    maxSize = "25%",
+    dataLabels = list(enabled = T, format = '{point.y: .0f} ')) %>% 
+  hc_title(
+    text='Household Connection Per Sub-Counties',
+    style = list(fontWeight = "bold", fontSize = "15px"),
+    align = "center") %>% 
+  hc_tooltip(sort = TRUE, table = TRUE) %>% 
+  hc_add_theme(hc_theme_darkunica())%>% 
+  hc_yAxis(title=list(text='Number of Households Connected' )) %>% 
+  hc_xAxis(title=list(text='Nakuru Sub-Counties'))
 
 ```
 
@@ -195,24 +194,25 @@ Row {data-height=400}
 ### Cumulative Households Using Water Kiosk 
 
 ```{r}
-Data4%>%
+
+Data4 %>% 
   group_by(Sub_Counties)%>%
   summarise(Households_using_Water_Kiosks=sum(Households_using_Water_Kiosks))%>%
-  arrange(Households_using_Water_Kiosks)%>%
-  e_charts(Sub_Counties)%>%
-  e_pie(serie = Households_using_Water_Kiosks, radius=c('30%','70%'))%>%
-  e_tooltip(trigger = "item")%>%
-  #e_labels(TRUE)%>%
-   e_title(text = 'Number Households Using Kiosks ',
-          subtext = '',
-          left='center', top=20)%>%
-  e_toolbox_feature('dataView')%>%
-   e_toolbox_feature('dataZoom')%>%
-  e_toolbox_feature('restore') %>%
-  e_toolbox_feature('saveAsImage')%>%
-  e_legend(show = TRUE)%>%
-    e_legend(orient='horizontal',left=8,top="85%")%>%
-  e_theme('chalk')
+  arrange(-Households_using_Water_Kiosks)%>%# indicate - to arrange from big to small
+  hchart(
+    'column', hcaes(x=Sub_Counties, y= Households_using_Water_Kiosks),
+    showInLegend=F,
+    maxSize = "25%",
+    dataLabels = list(enabled = T, format = '{point.y: .0f} ')) %>% 
+  hc_title(
+    text='Household of Households Using Water Kiosks',
+    style = list(fontWeight = "bold", fontSize = "15px"),
+    align = "center") %>% 
+  hc_tooltip(sort = TRUE, table = TRUE) %>% 
+  hc_add_theme(hc_theme_flat())%>% 
+  hc_yAxis(title=list(text='Number of Households using water Kiosk' )) %>% 
+  hc_xAxis(title=list(text='Nakuru Sub-Counties'))
+
 
 ```
 
@@ -246,8 +246,8 @@ Data4%>%
   e_toolbox_feature('restore') %>%
    e_toolbox_feature('dataZoom')%>%
   e_toolbox_feature('saveAsImage')%>%
-  e_legend(orient='horizontal',left=8,top="85%")%>%
-  e_theme('chalk')
+  e_legend(orient='horizontal',left=8,top="91%")%>%
+  e_theme('vintage')
 
 ```
 
@@ -271,7 +271,7 @@ Data4%>%
   e_toolbox_feature('restore') %>%
   e_toolbox_feature('saveAsImage')%>%
   e_legend(orient='horizontal',left=8,top="90%")%>%
-  e_theme('chalk')
+  e_theme('vintage')
 ```
 
 
