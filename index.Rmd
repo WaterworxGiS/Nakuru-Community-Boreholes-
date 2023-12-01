@@ -31,12 +31,9 @@ library(janitor)
   
 ```
 
-column: {.sidebar},
---------------------------------------------------------------
-
 
 ```{r read}
-Data4 <- read_csv("E:/Nakuru WaterWax/Unicef Project/Data Using R/Borehole Data in Flex dashboard/Data4.csv")
+Data4 <- read_csv("F:/Folder E/Nakuru WaterWax/Unicef Project/Data Using R/Borehole Data in Flex dashboard/Data4.csv")
 
 Data4$Longitude <- as.numeric(Data4$Longitude)
 Data4$Latitude <- as.numeric(Data4$Latitude)
@@ -428,9 +425,10 @@ datatable(Data4,
           rownames = T,
           filter = "top",
           class = "hover cell-border stripe", #for making grid cells
-          #editable = "cell", # for editing cells
+          editable = "cell", # for editing cells
+          
           extensions="Buttons",
-          options = list(pageLength = 20,dom="Bfrtip", buttons=c( '','', '' )))
+          options = list(pageLength = 20,dom="Bfrtip", buttons=c( 'copy','csv', '' )))
 
 ```
 
